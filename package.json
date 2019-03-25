@@ -7,9 +7,7 @@
     "codecov": "codecov",
     "test": "jest",
     "test:mutate": "stryker run",
-    "lint:js": "eslint src --max-warnings 0",
-    "lint:spec": "eslint spec --max-warnings 0 --config .spec.eslintrc",
-    "lint": "yarn lint:js && yarn lint:spec",
+    "lint": "eslint --max-warnings 0 src spec",
     "docs": "jsdoc src",
     "build": "babel src -d dist",
     "prepublishOnly": "yarn build"
