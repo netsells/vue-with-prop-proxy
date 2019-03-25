@@ -1,6 +1,6 @@
 {
   "name": "@netsells/vue-with-prop-proxy",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Proxy a prop in Vue to make it easier to set it if using v-model or the sync modifier",
   "main": "dist/index.js",
   "scripts": {
