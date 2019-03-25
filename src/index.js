@@ -36,7 +36,6 @@ export const generateComputedProxy = (prop) => ({
     },
 });
 
-
 /**
  * Wrap props with a computed proxy to make it easier to update or use in
  * v-models
@@ -61,7 +60,7 @@ export default (
 
             computed[`${ proxy }${ suffix }`] = generateComputedProxy(proxy);
         } else {
-            computed[proxy.via] = generateComputedProxy(proxy.prop)
+            computed[proxy.via] = generateComputedProxy(proxy.prop);
         }
     });
 
