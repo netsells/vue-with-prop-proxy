@@ -41,24 +41,28 @@ export const generateComputedProxy = (prop) => ({
  * Wrap props with a computed proxy to make it easier to update or use in
  * v-models
  *
- * @param {Array<String>|String} props - Props to proxy
+ * @param {Array<String|Object>|String|Object} proxies - Props to proxy
  *
  * @returns {Object} mixin
  */
 export default (
-    props,
+    proxies,
     {
         suffix = 'Proxy',
     } = {},
 ) => {
     const computed = {};
 
-    if (!suffix || !suffix.length) {
-        throw new Error('You must have a suffix for your proxies props');
-    }
+    (Array.isArray(proxies) ? proxies : [proxies]).forEach(proxy => {
+        if (typeof proxy === 'string') {
+            if (!suffix || !suffix.length) {
+                throw new Error('You must have a suffix for your proxies props');
+            }
 
-    (Array.isArray(props) ? props : [props]).forEach(prop => {
-        computed[`${ prop }${ suffix }`] = generateComputedProxy(prop);
+            computed[`${ proxy }${ suffix }`] = generateComputedProxy(proxy);
+        } else {
+            computed[proxy.via] = generateComputedProxy(proxy.prop)
+        }
     });
 
     return { computed };

@@ -84,4 +84,29 @@ describe('withPropProxy', () => {
             }).toThrow(new Error('You must have a suffix for your proxies props'));
         });
     });
+
+    describe('when suffix falsy but prop object', () => {
+        it('does not throw an error', () => {
+            expect(() => {
+                withPropProxy({ prop: 'foo', via: 'fooModel' }, { suffix: null });
+            }).not.toThrow();
+        });
+    });
+
+    describe('when suffix falsy, one prop object, one prop string', () => {
+        it('throws an error', () => {
+            expect(() => {
+                withPropProxy(['bar', { prop: 'foo', via: 'fooModel' }], { suffix: null });
+            }).toThrow(new Error('You must have a suffix for your proxies props'));
+        });
+    });
+
+    describe('when object passed', () => {
+        it('uses object options instead of suffix', () => {
+            expect(withPropProxy({ prop: 'foo', via: 'fooModel' }).computed)
+                .toEqual({
+                    fooModel: commonProxy,
+                });
+        });
+    });
 });
