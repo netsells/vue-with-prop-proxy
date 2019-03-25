@@ -8,6 +8,7 @@ jobs:
     - stage: test
       script:
         - yarn run test
+        - yarn run test:mutate
         - yarn run codecov
     - stage: build
       script:
