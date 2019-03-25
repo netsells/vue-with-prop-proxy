@@ -1,3 +1,5 @@
+import { mount } from '@vue/test-utils'
+
 import withPropProxy, { getPropEmitName, generateComputedProxy } from '../src/index';
 
 const commonProxy = {
@@ -107,6 +109,54 @@ describe('withPropProxy', () => {
                 .toEqual({
                     fooModel: commonProxy,
                 });
+        });
+    });
+});
+
+describe('with wrapped component', () => {
+    const component = {
+        template: `
+            <div>
+                <span class="model">{{ model }}</span>
+                <span class="itemProxy">{{ itemProxy }}</span>
+            </div>
+        `,
+
+        mixins: [
+            withPropProxy([
+                { prop: 'value', via: 'model' },
+                'item',
+            ])
+        ],
+
+        props: {
+            value: {
+                type: String,
+                required: true,
+            },
+
+            item: {
+                type: Object,
+                required: true,
+            },
+        },
+    };
+
+    describe('when mounted', () => {
+        let wrapper;
+
+        beforeEach(() => {
+            wrapper = mount(component, {
+                propsData: {
+                    value: 'foo',
+                    item: { id: 'foo' },
+                },
+            });
+        });
+
+        it('proxies the props via the getters', () => {
+            expect(wrapper.find('.model').text()).toBe('foo');
+            expect(wrapper.find('.itemProxy').text()).toBe(JSON.stringify({ id: 'foo' }, null, 2));
         });
     });
 });
