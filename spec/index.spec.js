@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils';
 
 import withPropProxy, { getPropEmitName, generateComputedProxy } from '../src/index';
 
@@ -126,7 +126,7 @@ describe('with wrapped component', () => {
             withPropProxy([
                 { prop: 'value', via: 'model' },
                 'item',
-            ])
+            ]),
         ],
 
         props: {
