@@ -1,0 +1,14 @@
+language: node_js
+node_js: 8
+jobs:
+  include:
+    - stage: lint
+      script:
+        - yarn run lint
+    - stage: test
+      script:
+        - yarn run test
+        - yarn run codecov
+    - stage: build
+      script:
+        - yarn run build
