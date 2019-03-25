@@ -158,5 +158,25 @@ describe('with wrapped component', () => {
             expect(wrapper.find('.model').text()).toBe('foo');
             expect(wrapper.find('.itemProxy').text()).toBe(JSON.stringify({ id: 'foo' }, null, 2));
         });
+
+        describe('when setting model', () => {
+            beforeEach(() => {
+                wrapper.vm.model = 'bar';
+            });
+
+            it('emits a new value', () => {
+                expect(wrapper.emitted().input[0]).toEqual(['bar']);
+            });
+        });
+
+        describe('when setting itemProxy', () => {
+            beforeEach(() => {
+                wrapper.vm.itemProxy = { id: 'bar' };
+            });
+
+            it('emits a new value', () => {
+                expect(wrapper.emitted()['update:item'][0]).toEqual([{ id: 'bar' }]);
+            });
+        });
     });
 });
