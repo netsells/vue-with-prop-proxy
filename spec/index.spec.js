@@ -1,4 +1,9 @@
-import withPropProxy, { getPropEmitName } from '../src/index';
+import withPropProxy, { getPropEmitName, generateComputedProxy } from '../src/index';
+
+const commonProxy = {
+    get: expect.any(Function),
+    set: expect.any(Function),
+};
 
 describe('getPropEmitName', () => {
     it('returns `input` when passed `value`', () => {
@@ -10,12 +15,13 @@ describe('getPropEmitName', () => {
     });
 });
 
-describe('withPropProxy', () => {
-    const commonProxy = {
-        get: expect.any(Function),
-        set: expect.any(Function),
-    };
+describe('generateComputedProxy', () => {
+    it('returns getter and setter based on prop', () => {
+        expect(generateComputedProxy('prop')).toEqual(commonProxy);
+    });
+});
 
+describe('withPropProxy', () => {
     describe('with no props', () => {
         it('adds no proxies', () => {
             expect(withPropProxy([]).computed).toEqual({});
