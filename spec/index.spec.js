@@ -20,6 +20,14 @@ describe('withPropProxy', () => {
         });
     });
 
+    describe('with empty options supplied', () => {
+        it('uses the default options', () => {
+            expect(withPropProxy('foo', {}).computed).toEqual({
+                fooProxy: commonProxy,
+            });
+        });
+    });
+
     describe('with one prop as an array', () => {
         it('adds a proxy', () => {
             expect(withPropProxy(['bar']).computed).toEqual({
@@ -34,6 +42,30 @@ describe('withPropProxy', () => {
                 fooProxy: commonProxy,
                 barProxy: commonProxy,
             });
+        });
+    });
+
+    describe('when suffix changed', () => {
+        it('adds a proxy with a different suffix', () => {
+            expect(withPropProxy('foo', { suffix: 'Model' }).computed).toEqual({
+                fooModel: commonProxy,
+            });
+        });
+    });
+
+    describe('when suffix empty string', () => {
+        it('throws an error', () => {
+            expect(() => {
+                withPropProxy('foo', { suffix: '' });
+            }).toThrow(new Error('You must have a suffix for your proxies props'));
+        });
+    });
+
+    describe('when suffix falsy', () => {
+        it('throws an error', () => {
+            expect(() => {
+                withPropProxy('foo', { suffix: null });
+            }).toThrow(new Error('You must have a suffix for your proxies props'));
         });
     });
 });
