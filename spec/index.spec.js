@@ -1,4 +1,14 @@
-import withPropProxy from '../src/index';
+import withPropProxy, { getPropEmitName } from '../src/index';
+
+describe('getPropEmitName', () => {
+    it('returns `input` when passed `value`', () => {
+        expect(getPropEmitName('value')).toBe('input');
+    });
+
+    it('returns `update:prop` when passed `prop`', () => {
+        expect(getPropEmitName('prop')).toBe('update:prop');
+    });
+});
 
 describe('withPropProxy', () => {
     const commonProxy = {
