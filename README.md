@@ -48,7 +48,7 @@ import withPropProxy from '@netsells/vue-with-prop-proxy';
 export default {
     mixins: [withPropProxy(['value', 'name'])],
 
-    props: ['value'],
+    props: ['value', 'name'],
 
     template: `
         <div>
@@ -65,7 +65,7 @@ export default {
 import withPropProxy from '@netsells/vue-with-prop-proxy';
 
 export default {
-    mixins: [withPropProxy({ name: 'value', via: 'model' })],
+    mixins: [withPropProxy({ prop: 'value', via: 'model' })],
 
     props: ['value'],
 
