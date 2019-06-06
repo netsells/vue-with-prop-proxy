@@ -120,6 +120,11 @@
   resolved "https://registry.yarnpkg.com/@stryker-mutator/util/-/util-0.0.3.tgz#097c069a3c795449e170d9ded7da7e139bf41a7d"
   integrity sha512-vOvh7DHw2qbPsoYYddjVN3merk38ZkNIH6TBErNi0SXtCBxoViBppXHtcSdG5NBnT/mwjNhSC5dv8jDznkHk7w==
 
+"@stryker-mutator/util@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@stryker-mutator/util/-/util-0.1.0.tgz#da8a8d6e5f4fd616efa1211b3f1cf20164b22bbe"
+  integrity sha512-1hdU/FV5vkBeIfkBjoNC5AUGEZYvxkjKHBvRgAqoSvMQ0X0hfZXCB1eXdOIW2CbZj6/IlSxVvBwBejAsFXDfmw==
+
 "@vue/test-utils@^1.0.0-beta.29":
   version "1.0.0-beta.29"
   resolved "https://registry.yarnpkg.com/@vue/test-utils/-/test-utils-1.0.0-beta.29.tgz#c942cf25e891cf081b6a03332b4ae1ef430726f0"
@@ -5098,6 +5103,13 @@ stryker-api@^0.22.0:
   dependencies:
     tslib "~1.9.3"
 
+stryker-api@^0.24.1:
+  version "0.24.1"
+  resolved "https://registry.yarnpkg.com/stryker-api/-/stryker-api-0.24.1.tgz#4d970a60a3c00101683df172a2dc7b182cab97d1"
+  integrity sha512-7ar/+f96KXokhy8sT8EotUjt0+7hyeMpDQTQklWwhOkT6EHWLGYA1VBnYsrkn/KfSzNF8i6lUArBIJnyyfkc7A==
+  dependencies:
+    tslib "~1.9.3"
+
 stryker-babel-transpiler@^0.7.10:
   version "0.7.10"
   resolved "https://registry.yarnpkg.com/stryker-babel-transpiler/-/stryker-babel-transpiler-0.7.10.tgz#4f784851b1c288abd12960106a813dfb42d6463c"
@@ -5106,18 +5118,19 @@ stryker-babel-transpiler@^0.7.10:
     babel-core "6.26.3"
     minimatch "~3.0.4"
 
-stryker-html-reporter@^0.16.9:
-  version "0.16.9"
-  resolved "https://registry.yarnpkg.com/stryker-html-reporter/-/stryker-html-reporter-0.16.9.tgz#601c1f8c2f74a0ea6ccad0bb689c77f86c9fe395"
-  integrity sha512-V4Rcca2PfVHRwntH8pQ2zDS8q2H9KvGe+v6YYSB6BJqZ0Y+lWrVrFdAxmLEDzYXOIOdeYZwNBzJClfqLhAl65g==
+stryker-html-reporter@^0.18.1:
+  version "0.18.1"
+  resolved "https://registry.yarnpkg.com/stryker-html-reporter/-/stryker-html-reporter-0.18.1.tgz#5c4345492b3bb7549c7b4919f44d4541e7b7e807"
+  integrity sha512-vfc2UTbiFpsgFyJh/Ag3ZgZR4aJ/vUbcGX7CE7ES8X6wAVzYL8QZ6B2JdqRH6Lz8bY9hw6RvTwyHCwxf254DFg==
   dependencies:
-    "@stryker-mutator/util" "^0.0.3"
+    "@stryker-mutator/util" "^0.1.0"
     file-url "~2.0.0"
     lodash "~4.17.10"
     mkdirp "~0.5.1"
     mz "~2.7.0"
     rimraf "~2.6.1"
-    typed-html "~0.6.0"
+    stryker-api "^0.24.1"
+    typed-html "~1.0.0"
 
 stryker-javascript-mutator@^0.12.1:
   version "0.12.1"
@@ -5392,10 +5405,10 @@ type-is@~1.6.16:
     media-typer "0.3.0"
     mime-types "~2.1.18"
 
-typed-html@~0.6.0:
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/typed-html/-/typed-html-0.6.0.tgz#15a6c19e6f4f7ee710b36a7b650a37c4e614dea5"
-  integrity sha512-9+DKF5DrTp209aS7rZ/YWcmoGLXClzHrlxbW4G/PwCGAs8wehOdvKjaffNqIBwn2wrA8q7Upr/t+ZTP88Uojhw==
+typed-html@~1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/typed-html/-/typed-html-1.0.0.tgz#b749d9de7989e05febe133636c360823b7ed0f51"
+  integrity sha512-/MGJs8DqjNdJWSnUdV7U7VeSwhKYNZli0wq84h5zPg/+76DNuDEnWloAkzmoYdgQOWtwZIlyLUQMLHYuUnP3tQ==
 
 typed-rest-client@~1.0.7:
   version "1.0.11"
