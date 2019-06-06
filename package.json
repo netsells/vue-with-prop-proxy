@@ -27,7 +27,7 @@
     "eslint": "^4.10.0",
     "eslint-plugin-jest": "^22.1.2",
     "express": "^4.16.4",
-    "jest": "^23.6.0",
+    "jest": "^24.8.0",
     "jsdoc": "^3.5.5",
     "regenerator-runtime": "^0.13.1",
     "start-server-and-test": "^1.7.11",
