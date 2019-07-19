@@ -86,6 +86,11 @@ export default (
                 dataProps.push(proxy.prop);
 
                 watch[proxy.prop] = {
+                    /**
+                     * Update the optional data prop when the main prop changes
+                     *
+                     * @param {any} value
+                     */
                     handler(value) {
                         this[getPropOptionalName(proxy.prop)] = value;
                     },
