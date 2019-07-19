@@ -10,19 +10,43 @@ export const getPropEmitName = prop => prop === 'value'
     : `update:${ prop }`;
 
 /**
- * Get a computed proxy based on the prop
+ * Get a props optional data name
  *
  * @param {String} prop
  *
+ * @returns {String}
+ */
+export const getPropOptionalName = prop => `${ prop }Optional`;
+
+/**
+ * Check if a prop is set
+ *
+ * @param {Object} vm
+ * @param {String} prop
+ *
+ * @returns {Boolean}
+ */
+export const isPropSet = (vm, prop) => Object.keys(vm.$options.propsData).includes(prop);
+
+/**
+ * Get a computed proxy based on the prop
+ *
+ * @param {String} prop
+ * @param {Boolean} optional
+ *
  * @returns {Object}
  */
-export const generateComputedProxy = (prop) => ({
+export const generateComputedProxy = (prop, optional = false) => ({
     /**
      * Get the existing prop
      *
      * @returns {any}
      */
     get() {
+        if (optional && !isPropSet(this,prop)) {
+            return this[getPropOptionalName(prop)];
+        }
+
         return this[prop];
     },
 
@@ -32,6 +56,12 @@ export const generateComputedProxy = (prop) => ({
      * @param {any} value
      */
     set(value) {
+        if (optional && !isPropSet(this,prop)) {
+            this[getPropOptionalName(prop)] = value;
+
+            return;
+        }
+
         this.$emit(getPropEmitName(prop), value);
     },
 });
@@ -51,6 +81,7 @@ export default (
     } = {},
 ) => {
     const computed = {};
+    const dataProps = [];
 
     (Array.isArray(proxies) ? proxies : [proxies]).forEach(proxy => {
         if (typeof proxy === 'string') {
@@ -60,9 +91,25 @@ export default (
 
             computed[`${ proxy }${ suffix }`] = generateComputedProxy(proxy);
         } else {
-            computed[proxy.via] = generateComputedProxy(proxy.prop);
+            computed[proxy.via] = generateComputedProxy(proxy.prop, proxy.optional);
+
+            if (proxy.optional) {
+                dataProps.push(proxy.prop);
+            }
         }
     });
 
-    return { computed };
+    return {
+        data() {
+            const optionalData = {};
+
+            dataProps.forEach(prop => {
+                optionalData[getPropOptionalName(prop)] = this[prop]; // Set to default value
+            });
+
+            return optionalData;
+        },
+
+        computed,
+    };
 };

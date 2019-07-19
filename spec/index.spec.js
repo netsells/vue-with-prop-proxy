@@ -1,11 +1,21 @@
 import { mount } from '@vue/test-utils';
 
-import withPropProxy, { getPropEmitName, generateComputedProxy } from '../src/index';
+import withPropProxy, {
+    getPropEmitName,
+    generateComputedProxy,
+    getPropOptionalName,
+} from '../src/index';
 
 const commonProxy = {
     get: expect.any(Function),
     set: expect.any(Function),
 };
+
+describe('getPropOptionalName', () => {
+    it('gets the optional data property name for a prop', () => {
+        expect(getPropOptionalName('foo')).toBe('fooOptional');
+    });
+});
 
 describe('getPropEmitName', () => {
     it('returns `input` when passed `value`', () => {
@@ -118,6 +128,7 @@ describe('with wrapped component', () => {
         template: `
             <div>
                 <span class="model">{{ model }}</span>
+                <span class="optionalButNotSettable">{{ optionalButNotSettable }}</span>
                 <span class="itemProxy">{{ itemProxy }}</span>
                 <span class="optOne">{{ optOne }}</span>
                 <span class="optTwo">{{ optTwo }}</span>
@@ -216,7 +227,7 @@ describe('with wrapped component', () => {
             });
 
             it('does not emit a new value', () => {
-                expect(wrapper.emitted()['update:optTwo']).toEqual([]);
+                expect(wrapper.emitted()['update:optTwo']).toBeFalsy();
             });
 
             it('changes the proxy because there is no prop to change', () => {
