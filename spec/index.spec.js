@@ -119,6 +119,8 @@ describe('with wrapped component', () => {
             <div>
                 <span class="model">{{ model }}</span>
                 <span class="itemProxy">{{ itemProxy }}</span>
+                <span class="optOne">{{ optOne }}</span>
+                <span class="optTwo">{{ optTwo }}</span>
             </div>
         `,
 
@@ -126,6 +128,8 @@ describe('with wrapped component', () => {
             withPropProxy([
                 { prop: 'value', via: 'model' },
                 'item',
+                { prop: 'optOne', via: 'opt1', optional: true },
+                { prop: 'optTwo', via: 'opt2', optional: true },
             ]),
         ],
 
@@ -139,6 +143,16 @@ describe('with wrapped component', () => {
                 type: Object,
                 required: true,
             },
+
+            optOne: {
+                type: Number,
+                default: 0,
+            },
+
+            optTwo: {
+                type: Number,
+                default: 0,
+            },
         },
     };
 
@@ -150,6 +164,7 @@ describe('with wrapped component', () => {
                 propsData: {
                     value: 'foo',
                     item: { id: 'foo' },
+                    optOne: 5,
                 },
             });
         });
@@ -157,6 +172,8 @@ describe('with wrapped component', () => {
         it('proxies the props via the getters', () => {
             expect(wrapper.find('.model').text()).toBe('foo');
             expect(wrapper.find('.itemProxy').text()).toBe(JSON.stringify({ id: 'foo' }, null, 2));
+            expect(wrapper.find('.optOne').text()).toBe('5');
+            expect(wrapper.find('.optTwo').text()).toBe('0');
         });
 
         describe('when setting model', () => {
@@ -176,6 +193,34 @@ describe('with wrapped component', () => {
 
             it('emits a new value', () => {
                 expect(wrapper.emitted()['update:item'][0]).toEqual([{ id: 'bar' }]);
+            });
+        });
+
+        describe('when setting opt1', () => {
+            beforeEach(() => {
+                wrapper.vm.opt1 = 8;
+            });
+
+            it('emits a new value', () => {
+                expect(wrapper.emitted()['update:optOne'][0]).toEqual([8]);
+            });
+
+            it('does not change the value as the prop has not changed', () => {
+                expect(wrapper.vm.opt1).toBe(5);
+            });
+        });
+
+        describe('when setting opt2', () => {
+            beforeEach(() => {
+                wrapper.vm.opt2 = 9;
+            });
+
+            it('does not emit a new value', () => {
+                expect(wrapper.emitted()['update:optTwo']).toEqual([]);
+            });
+
+            it('changes the proxy because there is no prop to change', () => {
+                expect(wrapper.vm.opt2).toBe(9);
             });
         });
     });
