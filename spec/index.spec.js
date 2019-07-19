@@ -128,16 +128,17 @@ describe('with wrapped component', () => {
         template: `
             <div>
                 <span class="model">{{ model }}</span>
-                <span class="optionalButNotSettable">{{ optionalButNotSettable }}</span>
+                <span class="unsettableProxy">{{ unsettableProxy }}</span>
                 <span class="itemProxy">{{ itemProxy }}</span>
-                <span class="optOne">{{ optOne }}</span>
-                <span class="optTwo">{{ optTwo }}</span>
+                <span class="opt1">{{ opt1 }}</span>
+                <span class="opt2">{{ opt2 }}</span>
             </div>
         `,
 
         mixins: [
             withPropProxy([
                 { prop: 'value', via: 'model' },
+                'unsettable',
                 'item',
                 { prop: 'optOne', via: 'opt1', optional: true },
                 { prop: 'optTwo', via: 'opt2', optional: true },
@@ -148,6 +149,11 @@ describe('with wrapped component', () => {
             value: {
                 type: String,
                 required: true,
+            },
+
+            unsettable: {
+                type: String,
+                default: 'foo',
             },
 
             item: {
@@ -183,8 +189,20 @@ describe('with wrapped component', () => {
         it('proxies the props via the getters', () => {
             expect(wrapper.find('.model').text()).toBe('foo');
             expect(wrapper.find('.itemProxy').text()).toBe(JSON.stringify({ id: 'foo' }, null, 2));
-            expect(wrapper.find('.optOne').text()).toBe('5');
-            expect(wrapper.find('.optTwo').text()).toBe('0');
+            expect(wrapper.find('.opt1').text()).toBe('5');
+            expect(wrapper.find('.opt2').text()).toBe('0');
+            expect(wrapper.find('.unsettableProxy').text()).toBe('foo');
+        });
+
+        it('does not add optional data for non optional props', () => {
+            expect(wrapper.vm[getPropOptionalName('value')]).toBeFalsy();
+            expect(wrapper.vm[getPropOptionalName('item')]).toBeFalsy();
+            expect(wrapper.vm[getPropOptionalName('unsettable')]).toBeFalsy();
+        });
+
+        it('adds optional data for optional props', () => {
+            expect(wrapper.vm[getPropOptionalName('optOne')]).toBeTruthy();
+            expect(wrapper.vm[getPropOptionalName('optTwo')]).toBe(0);
         });
 
         describe('when setting model', () => {
@@ -194,6 +212,22 @@ describe('with wrapped component', () => {
 
             it('emits a new value', () => {
                 expect(wrapper.emitted().input[0]).toEqual(['bar']);
+            });
+
+            it('does not set the optional value', () => {
+                const prop = getPropOptionalName('value');
+
+                expect(wrapper.vm[prop]).toBeFalsy();
+            });
+        });
+
+        describe('when setting unsettableProxy', () => {
+            beforeEach(() => {
+                wrapper.vm.unsettableProxy = 'bar';
+            });
+
+            it('emits a new value', () => {
+                expect(wrapper.emitted()['update:unsettable'][0]).toEqual(['bar']);
             });
         });
 
@@ -216,8 +250,8 @@ describe('with wrapped component', () => {
                 expect(wrapper.emitted()['update:optOne'][0]).toEqual([8]);
             });
 
-            it('does not change the value as the prop has not changed', () => {
-                expect(wrapper.vm.opt1).toBe(5);
+            it('sets the prop to the new value', () => {
+                expect(wrapper.vm.opt1).toBe(8);
             });
         });
 
@@ -226,12 +260,24 @@ describe('with wrapped component', () => {
                 wrapper.vm.opt2 = 9;
             });
 
-            it('does not emit a new value', () => {
-                expect(wrapper.emitted()['update:optTwo']).toBeFalsy();
+            it('emits a new value', () => {
+                expect(wrapper.emitted()['update:optTwo'][0]).toEqual([9]);
             });
 
             it('changes the proxy because there is no prop to change', () => {
                 expect(wrapper.vm.opt2).toBe(9);
+            });
+
+            describe('when setting optTwo', () => {
+                beforeEach(() => {
+                    wrapper.setProps({
+                        optTwo: 14,
+                    });
+                });
+
+                it('changes the proxy to the new prop', () => {
+                    expect(wrapper.find('.opt2').text()).toBe('14');
+                });
             });
         });
     });

@@ -19,16 +19,6 @@ export const getPropEmitName = prop => prop === 'value'
 export const getPropOptionalName = prop => `${ prop }Optional`;
 
 /**
- * Check if a prop is set
- *
- * @param {Object} vm
- * @param {String} prop
- *
- * @returns {Boolean}
- */
-export const isPropSet = (vm, prop) => Object.keys(vm.$options.propsData).includes(prop);
-
-/**
  * Get a computed proxy based on the prop
  *
  * @param {String} prop
@@ -43,7 +33,7 @@ export const generateComputedProxy = (prop, optional = false) => ({
      * @returns {any}
      */
     get() {
-        if (optional && !isPropSet(this,prop)) {
+        if (optional) {
             return this[getPropOptionalName(prop)];
         }
 
@@ -56,10 +46,8 @@ export const generateComputedProxy = (prop, optional = false) => ({
      * @param {any} value
      */
     set(value) {
-        if (optional && !isPropSet(this,prop)) {
+        if (optional) {
             this[getPropOptionalName(prop)] = value;
-
-            return;
         }
 
         this.$emit(getPropEmitName(prop), value);
@@ -81,6 +69,7 @@ export default (
     } = {},
 ) => {
     const computed = {};
+    const watch = {};
     const dataProps = [];
 
     (Array.isArray(proxies) ? proxies : [proxies]).forEach(proxy => {
@@ -95,6 +84,12 @@ export default (
 
             if (proxy.optional) {
                 dataProps.push(proxy.prop);
+
+                watch[proxy.prop] = {
+                    handler(value) {
+                        this[getPropOptionalName(proxy.prop)] = value;
+                    },
+                };
             }
         }
     });
@@ -104,12 +99,14 @@ export default (
             const optionalData = {};
 
             dataProps.forEach(prop => {
-                optionalData[getPropOptionalName(prop)] = this[prop]; // Set to default value
+                optionalData[getPropOptionalName(prop)] = this[prop];
             });
 
             return optionalData;
         },
 
         computed,
+
+        watch,
     };
 };
