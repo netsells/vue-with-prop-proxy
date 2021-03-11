@@ -88,34 +88,38 @@ export default (proxies, options) => {
     const watch = {};
     const dataProps = [];
 
-    getParsedProxies(proxies, options).forEach(proxy => {
-        computed[proxy.via] = generateComputedProxy(proxy.prop, proxy.optional);
+    getParsedProxies(proxies, options)
+        .forEach(proxy => {
+            computed[proxy.via] = generateComputedProxy(proxy.prop, proxy.optional);
 
-        if (proxy.optional) {
-            dataProps.push(proxy.prop);
+            if (proxy.optional) {
+                dataProps.push({
+                    prop: proxy.prop,
+                    name: getPropOptionalName(proxy.prop),
+                });
 
-            watch[proxy.prop] = {
-                /**
-                 * Update the optional data prop when the main prop changes
-                 *
-                 * @param {any} value
-                 */
-                handler(value) {
-                    this[getPropOptionalName(proxy.prop)] = value;
-                },
-            };
-        }
-    });
+                watch[proxy.prop] = {
+                    /**
+                     * Update the optional data prop when the main prop changes
+                     *
+                     * @param {any} value
+                     */
+                    handler(value) {
+                        this[getPropOptionalName(proxy.prop)] = value;
+                    },
+                };
+            }
+        });
 
     return {
         data() {
-            const optionalData = {};
+            const data = {};
 
-            dataProps.forEach(prop => {
-                optionalData[getPropOptionalName(prop)] = this[prop];
+            dataProps.forEach(({ prop, name }) => {
+                data[name] = this[prop];
             });
 
-            return optionalData;
+            return data;
         },
 
         computed,
