@@ -2,7 +2,6 @@ import { mount } from '@vue/test-utils';
 
 import withPropProxy, {
     getPropEmitName,
-    generateComputedProxy,
     getPropOptionalName,
 } from '../src/index';
 
@@ -24,12 +23,6 @@ describe('getPropEmitName', () => {
 
     it('returns `update:prop` when passed `prop`', () => {
         expect(getPropEmitName('prop')).toBe('update:prop');
-    });
-});
-
-describe('generateComputedProxy', () => {
-    it('returns getter and setter based on prop', () => {
-        expect(generateComputedProxy('prop')).toEqual(commonProxy);
     });
 });
 

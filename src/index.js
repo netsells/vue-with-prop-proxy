@@ -60,48 +60,6 @@ export function getPropOptionalName(prop) {
 }
 
 /**
- * Get a computed proxy based on the prop
- *
- * @private
- *
- * @param {String} prop
- * @param {Boolean} optional
- *
- * @returns {Object}
- */
-export function generateComputedProxy(prop, optional = false) {
-    return {
-        /**
-         * Get the existing prop
-         *
-         * @returns {any}
-         * @private
-         */
-        get() {
-            if (optional) {
-                return this[getPropOptionalName(prop)];
-            }
-
-            return this[prop];
-        },
-
-        /**
-         * Update the prop to the new value
-         *
-         * @param {any} value
-         * @private
-         */
-        set(value) {
-            if (optional) {
-                this[getPropOptionalName(prop)] = value;
-            }
-
-            this.$emit(getPropEmitName(prop), value);
-        },
-    };
-}
-
-/**
  * Get parsed proxy config.
  *
  * @param {PropProxyDefinitions} proxies
@@ -140,8 +98,36 @@ export function getParsedProxies(proxyOrProxies, {
 export function getMixinForProxy({ prop, via, optional }) {
     const mixin = {
         computed: {
-            [via]: generateComputedProxy(prop, optional),
-        }
+            [via]: {
+                /**
+                 * Get the existing prop
+                 *
+                 * @returns {any}
+                 * @private
+                 */
+                get() {
+                    if (optional) {
+                        return this[getPropOptionalName(prop)];
+                    }
+
+                    return this[prop];
+                },
+
+                /**
+                 * Update the prop to the new value
+                 *
+                 * @param {any} value
+                 * @private
+                 */
+                set(value) {
+                    if (optional) {
+                        this[getPropOptionalName(prop)] = value;
+                    }
+
+                    this.$emit(getPropEmitName(prop), value);
+                },
+            },
+        },
     };
 
     if (optional) {
