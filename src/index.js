@@ -1,13 +1,52 @@
 /**
+ * Define a raw prop proxy.
+ *
+ * @typedef {object} ParsedPropProxyDefinition
+ * @property {string} prop - The prop to proxy.
+ * @property {string} via - The name to proxy it by.
+ * @property {boolean} [optional=false] - Whether to add an optional data element.
+ */
+
+/**
+ * Define a prop proxy.
+ *
+ * @typedef {ParsedPropProxyDefinition|string} PropProxyDefinition
+ */
+
+/**
+ * Define many prop proxies.
+ *
+ * @typedef {PropProxyDefinition|PropProxyDefinition[]} PropProxyDefinitions
+ */
+
+/**
+ * Prop proxy options.
+ *
+ * @typedef {object} PropProxyOptions
+ * @property {string} [suffix='Proxy'] - Suffix for basic proxies.
+ */
+
+/**
+ * Proxy mixin.
+ *
+ * @typedef {object} ProxyMixin
+ * @property {function} data
+ * @property {object} computed
+ * @property {object} watch
+ */
+
+/**
  * Get a props update emitter name
  *
  * @param {String} prop
  *
  * @returns {String}
  */
-export const getPropEmitName = prop => prop === 'value'
-    ? 'input'
-    : `update:${ prop }`;
+export function getPropEmitName(prop) {
+    return prop === 'value'
+        ? 'input'
+        : `update:${ prop }`;
+}
 
 /**
  * Get a props optional data name
@@ -16,44 +55,60 @@ export const getPropEmitName = prop => prop === 'value'
  *
  * @returns {String}
  */
-export const getPropOptionalName = prop => `${ prop }Optional`;
+export function getPropOptionalName(prop) {
+    return `${ prop }Optional`;
+}
 
 /**
  * Get a computed proxy based on the prop
+ *
+ * @private
  *
  * @param {String} prop
  * @param {Boolean} optional
  *
  * @returns {Object}
  */
-export const generateComputedProxy = (prop, optional = false) => ({
-    /**
-     * Get the existing prop
-     *
-     * @returns {any}
-     */
-    get() {
-        if (optional) {
-            return this[getPropOptionalName(prop)];
-        }
+export function generateComputedProxy(prop, optional = false) {
+    return {
+        /**
+         * Get the existing prop
+         *
+         * @returns {any}
+         * @private
+         */
+        get() {
+            if (optional) {
+                return this[getPropOptionalName(prop)];
+            }
 
-        return this[prop];
-    },
+            return this[prop];
+        },
 
-    /**
-     * Update the prop to the new value
-     *
-     * @param {any} value
-     */
-    set(value) {
-        if (optional) {
-            this[getPropOptionalName(prop)] = value;
-        }
+        /**
+         * Update the prop to the new value
+         *
+         * @param {any} value
+         * @private
+         */
+        set(value) {
+            if (optional) {
+                this[getPropOptionalName(prop)] = value;
+            }
 
-        this.$emit(getPropEmitName(prop), value);
-    },
-});
+            this.$emit(getPropEmitName(prop), value);
+        },
+    };
+}
 
+/**
+ * Get parsed proxy config.
+ *
+ * @param {PropProxyDefinitions} proxies
+ * @param {PropProxyOptions} options
+ *
+ * @returns {ParsedPropProxyDefinition[]}
+ */
 export function getParsedProxies(proxyOrProxies, {
     suffix = 'Proxy',
 } = {}) {
@@ -75,6 +130,13 @@ export function getParsedProxies(proxyOrProxies, {
     });
 }
 
+/**
+ * Get the mixin for a proxy definition
+ *
+ * @param {ParsedPropProxyDefinition} proxy
+ *
+ * @returns {ProxyMixin}
+ */
 export function getMixinForProxy({ prop, via, optional }) {
     const mixin = {
         computed: {
@@ -110,10 +172,15 @@ export function getMixinForProxy({ prop, via, optional }) {
  * Wrap props with a computed proxy to make it easier to update or use in
  * v-models
  *
- * @param {Array<String|Object>|String|Object} proxies - Props to proxy
+ * @param {PropProxyDefinitions} proxies - Props to proxy
+ * @param {PropProxyOptions} options
  *
- * @returns {Object} mixin
+ * @returns {ProxyMixin[]}
  */
-export default (proxies, options) => ({
-    mixins: getParsedProxies(proxies, options).map(getMixinForProxy),
-});
+function withPropProxy(proxies, options) {
+    return {
+        mixins: getParsedProxies(proxies, options).map(getMixinForProxy),
+    };
+}
+
+export default withPropProxy;

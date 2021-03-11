@@ -8,7 +8,7 @@
     "test": "jest",
     "test:mutate": "stryker run",
     "lint": "eslint --max-warnings 0 src spec",
-    "docs": "jsdoc src",
+    "docs": "jsdoc src/**",
     "build": "babel src -d dist",
     "prepublishOnly": "yarn build"
   },
