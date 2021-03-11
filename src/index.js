@@ -75,7 +75,7 @@ export function getParsedProxies(proxyOrProxies, {
     });
 }
 
-export function getMixinFromProxy({ prop, via, optional }) {
+export function getMixinForProxy({ prop, via, optional }) {
     const mixin = {
         computed: {
             [via]: generateComputedProxy(prop, optional),
@@ -115,5 +115,5 @@ export function getMixinFromProxy({ prop, via, optional }) {
  * @returns {Object} mixin
  */
 export default (proxies, options) => ({
-    mixins: getParsedProxies(proxies, options).map(getMixinFromProxy),
+    mixins: getParsedProxies(proxies, options).map(getMixinForProxy),
 });
