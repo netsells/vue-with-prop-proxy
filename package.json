@@ -42,7 +42,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/netsells/vuex-rest-api-cache.git"
+    "url": "https://github.com/netsells/vue-with-prop-proxy.git"
   },
   "jest": {
     "moduleNameMapper": {
