@@ -34,52 +34,7 @@ describe('generateComputedProxy', () => {
 });
 
 describe('withPropProxy', () => {
-    describe('with no props', () => {
-        it('adds no proxies', () => {
-            expect(withPropProxy([]).computed).toEqual({});
-        });
-    });
-
-    describe('with one prop as string', () => {
-        it('adds a proxy', () => {
-            expect(withPropProxy('foo').computed).toEqual({
-                fooProxy: commonProxy,
-            });
-        });
-    });
-
-    describe('with empty options supplied', () => {
-        it('uses the default options', () => {
-            expect(withPropProxy('foo', {}).computed).toEqual({
-                fooProxy: commonProxy,
-            });
-        });
-    });
-
-    describe('with one prop as an array', () => {
-        it('adds a proxy', () => {
-            expect(withPropProxy(['bar']).computed).toEqual({
-                barProxy: commonProxy,
-            });
-        });
-    });
-
-    describe('with two props as an array', () => {
-        it('adds a proxy', () => {
-            expect(withPropProxy(['foo', 'bar']).computed).toEqual({
-                fooProxy: commonProxy,
-                barProxy: commonProxy,
-            });
-        });
-    });
-
-    describe('when suffix changed', () => {
-        it('adds a proxy with a different suffix', () => {
-            expect(withPropProxy('foo', { suffix: 'Model' }).computed).toEqual({
-                fooModel: commonProxy,
-            });
-        });
-    });
+    let retVal;
 
     describe('when suffix empty string', () => {
         it('throws an error', () => {
@@ -113,9 +68,67 @@ describe('withPropProxy', () => {
         });
     });
 
+    describe('with no props', () => {
+        it('adds no proxies', () => {
+            expect(withPropProxy([]).mixins).toEqual([]);
+        });
+    });
+
+    describe('with one prop as string', () => {
+        it('adds a proxy', () => {
+            expect(withPropProxy('foo').mixins[0].computed).toEqual({
+                fooProxy: commonProxy,
+            });
+        });
+    });
+
+    describe('with empty options supplied', () => {
+        it('uses the default options', () => {
+            expect(withPropProxy('foo', {}).mixins[0].computed).toEqual({
+                fooProxy: commonProxy,
+            });
+        });
+    });
+
+    describe('with one prop as an array', () => {
+        it('adds a proxy', () => {
+            expect(withPropProxy(['bar']).mixins[0].computed).toEqual({
+                barProxy: commonProxy,
+            });
+        });
+    });
+
+    describe('with two props as an array', () => {
+        beforeEach(() => {
+            retVal = withPropProxy(['foo', 'bar']);
+        });
+
+        it('adds 2 mixins', () => {
+            expect(retVal.mixins.length).toBe(2);
+        });
+
+        it('adds a proxy to both mixins', () => {
+            expect(retVal.mixins[0].computed).toEqual({
+                fooProxy: commonProxy,
+            });
+
+            expect(retVal.mixins[1].computed).toEqual({
+                barProxy: commonProxy,
+            });
+        });
+    });
+
+    describe('when suffix changed', () => {
+        it('adds a proxy with a different suffix', () => {
+            expect(withPropProxy('foo', { suffix: 'Model' }).mixins[0].computed).toEqual({
+                fooModel: commonProxy,
+            });
+        });
+    });
+
     describe('when object passed', () => {
         it('uses object options instead of suffix', () => {
-            expect(withPropProxy({ prop: 'foo', via: 'fooModel' }).computed)
+            expect(withPropProxy({ prop: 'foo', via: 'fooModel' }).mixins[0].computed)
                 .toEqual({
                     fooModel: commonProxy,
                 });

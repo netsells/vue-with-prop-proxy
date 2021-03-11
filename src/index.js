@@ -75,6 +75,37 @@ export function getParsedProxies(proxyOrProxies, {
     });
 }
 
+export function getMixinFromProxy({ prop, via, optional }) {
+    const mixin = {
+        computed: {
+            [via]: generateComputedProxy(prop, optional),
+        }
+    };
+
+    if (optional) {
+        mixin.data = function() {
+            return {
+                [getPropOptionalName(prop)]: this[prop],
+            }
+        }
+
+        mixin.watch = {
+            [prop]: {
+                /**
+                 * Update the optional data prop when the main prop changes
+                 *
+                 * @param {any} value
+                 */
+                handler(value) {
+                    this[getPropOptionalName(prop)] = value;
+                },
+            },
+        };
+    }
+
+    return mixin;
+}
+
 /**
  * Wrap props with a computed proxy to make it easier to update or use in
  * v-models
@@ -83,47 +114,6 @@ export function getParsedProxies(proxyOrProxies, {
  *
  * @returns {Object} mixin
  */
-export default (proxies, options) => {
-    const computed = {};
-    const watch = {};
-    const dataProps = [];
-
-    getParsedProxies(proxies, options)
-        .forEach(({ prop, via, optional }) => {
-            computed[via] = generateComputedProxy(prop, optional);
-
-            if (optional) {
-                dataProps.push({
-                    prop: prop,
-                    name: getPropOptionalName(prop),
-                });
-
-                watch[prop] = {
-                    /**
-                     * Update the optional data prop when the main prop changes
-                     *
-                     * @param {any} value
-                     */
-                    handler(value) {
-                        this[getPropOptionalName(prop)] = value;
-                    },
-                };
-            }
-        });
-
-    return {
-        data() {
-            const data = {};
-
-            dataProps.forEach(({ prop, name }) => {
-                data[name] = this[prop];
-            });
-
-            return data;
-        },
-
-        computed,
-
-        watch,
-    };
-};
+export default (proxies, options) => ({
+    mixins: getParsedProxies(proxies, options).map(getMixinFromProxy),
+});
