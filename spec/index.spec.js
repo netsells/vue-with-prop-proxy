@@ -43,16 +43,28 @@ describe('withPropProxy', () => {
     });
 
     describe('with no props', () => {
+        beforeEach(() => {
+            retVal = withPropProxy([]);
+        });
+
         it('adds no proxies', () => {
-            expect(withPropProxy([]).mixins).toEqual([]);
+            expect(retVal.mixins).toEqual([]);
         });
     });
 
     describe('with one prop as string', () => {
+        beforeEach(() => {
+            retVal = withPropProxy('foo');
+        });
+
         it('adds a proxy', () => {
-            expect(withPropProxy('foo').mixins[0].computed).toEqual({
+            expect(retVal.mixins[0].computed).toEqual({
                 fooProxy: commonProxy,
             });
+        });
+
+        it('adds no watchers', () => {
+            expect(retVal.mixins[0].watch).toEqual({});
         });
     });
 
