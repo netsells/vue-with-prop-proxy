@@ -54,6 +54,27 @@ export const generateComputedProxy = (prop, optional = false) => ({
     },
 });
 
+export function getParsedProxies(proxyOrProxies, {
+    suffix = 'Proxy',
+} = {}) {
+    const proxies = Array.isArray(proxyOrProxies) ? proxyOrProxies : [proxyOrProxies];
+
+    return proxies.map(proxy => {
+        if (typeof proxy === 'string') {
+            if (!suffix || !suffix.length) {
+                throw new Error('You must have a suffix for your proxies props');
+            }
+
+            return {
+                prop: proxy,
+                via: `${ proxy }${ suffix }`,
+            };
+        }
+
+        return proxy;
+    });
+}
+
 /**
  * Wrap props with a computed proxy to make it easier to update or use in
  * v-models
@@ -62,40 +83,27 @@ export const generateComputedProxy = (prop, optional = false) => ({
  *
  * @returns {Object} mixin
  */
-export default (
-    proxies,
-    {
-        suffix = 'Proxy',
-    } = {},
-) => {
+export default (proxies, options) => {
     const computed = {};
     const watch = {};
     const dataProps = [];
 
-    (Array.isArray(proxies) ? proxies : [proxies]).forEach(proxy => {
-        if (typeof proxy === 'string') {
-            if (!suffix || !suffix.length) {
-                throw new Error('You must have a suffix for your proxies props');
-            }
+    getParsedProxies(proxies, options).forEach(proxy => {
+        computed[proxy.via] = generateComputedProxy(proxy.prop, proxy.optional);
 
-            computed[`${ proxy }${ suffix }`] = generateComputedProxy(proxy);
-        } else {
-            computed[proxy.via] = generateComputedProxy(proxy.prop, proxy.optional);
+        if (proxy.optional) {
+            dataProps.push(proxy.prop);
 
-            if (proxy.optional) {
-                dataProps.push(proxy.prop);
-
-                watch[proxy.prop] = {
-                    /**
-                     * Update the optional data prop when the main prop changes
-                     *
-                     * @param {any} value
-                     */
-                    handler(value) {
-                        this[getPropOptionalName(proxy.prop)] = value;
-                    },
-                };
-            }
+            watch[proxy.prop] = {
+                /**
+                 * Update the optional data prop when the main prop changes
+                 *
+                 * @param {any} value
+                 */
+                handler(value) {
+                    this[getPropOptionalName(proxy.prop)] = value;
+                },
+            };
         }
     });
 
