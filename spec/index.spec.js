@@ -1,30 +1,11 @@
 import { mount } from '@vue/test-utils';
 
-import withPropProxy, {
-    getPropEmitName,
-    getPropOptionalName,
-} from '../src/index';
+import withPropProxy, { helpers } from '../src/index';
 
 const commonProxy = {
     get: expect.any(Function),
     set: expect.any(Function),
 };
-
-describe('getPropOptionalName', () => {
-    it('gets the optional data property name for a prop', () => {
-        expect(getPropOptionalName('foo')).toBe('fooOptional');
-    });
-});
-
-describe('getPropEmitName', () => {
-    it('returns `input` when passed `value`', () => {
-        expect(getPropEmitName('value')).toBe('input');
-    });
-
-    it('returns `update:prop` when passed `prop`', () => {
-        expect(getPropEmitName('prop')).toBe('update:prop');
-    });
-});
 
 describe('withPropProxy', () => {
     let retVal;
@@ -201,14 +182,14 @@ describe('with wrapped component', () => {
         });
 
         it('does not add optional data for non optional props', () => {
-            expect(wrapper.vm[getPropOptionalName('value')]).toBeFalsy();
-            expect(wrapper.vm[getPropOptionalName('item')]).toBeFalsy();
-            expect(wrapper.vm[getPropOptionalName('unsettable')]).toBeFalsy();
+            expect(wrapper.vm[helpers.getPropOptionalName('value')]).toBeFalsy();
+            expect(wrapper.vm[helpers.getPropOptionalName('item')]).toBeFalsy();
+            expect(wrapper.vm[helpers.getPropOptionalName('unsettable')]).toBeFalsy();
         });
 
         it('adds optional data for optional props', () => {
-            expect(wrapper.vm[getPropOptionalName('optOne')]).toBeTruthy();
-            expect(wrapper.vm[getPropOptionalName('optTwo')]).toBe(0);
+            expect(wrapper.vm[helpers.getPropOptionalName('optOne')]).toBeTruthy();
+            expect(wrapper.vm[helpers.getPropOptionalName('optTwo')]).toBe(0);
         });
 
         describe('when setting model', () => {
@@ -221,7 +202,7 @@ describe('with wrapped component', () => {
             });
 
             it('does not set the optional value', () => {
-                const prop = getPropOptionalName('value');
+                const prop = helpers.getPropOptionalName('value');
 
                 expect(wrapper.vm[prop]).toBeFalsy();
             });
