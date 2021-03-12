@@ -1,85 +1,14 @@
 import { mount } from '@vue/test-utils';
 
-import withPropProxy, {
-    getPropEmitName,
-    generateComputedProxy,
-    getPropOptionalName,
-} from '../src/index';
+import withPropProxy, { helpers } from '../src/index';
 
 const commonProxy = {
     get: expect.any(Function),
     set: expect.any(Function),
 };
 
-describe('getPropOptionalName', () => {
-    it('gets the optional data property name for a prop', () => {
-        expect(getPropOptionalName('foo')).toBe('fooOptional');
-    });
-});
-
-describe('getPropEmitName', () => {
-    it('returns `input` when passed `value`', () => {
-        expect(getPropEmitName('value')).toBe('input');
-    });
-
-    it('returns `update:prop` when passed `prop`', () => {
-        expect(getPropEmitName('prop')).toBe('update:prop');
-    });
-});
-
-describe('generateComputedProxy', () => {
-    it('returns getter and setter based on prop', () => {
-        expect(generateComputedProxy('prop')).toEqual(commonProxy);
-    });
-});
-
 describe('withPropProxy', () => {
-    describe('with no props', () => {
-        it('adds no proxies', () => {
-            expect(withPropProxy([]).computed).toEqual({});
-        });
-    });
-
-    describe('with one prop as string', () => {
-        it('adds a proxy', () => {
-            expect(withPropProxy('foo').computed).toEqual({
-                fooProxy: commonProxy,
-            });
-        });
-    });
-
-    describe('with empty options supplied', () => {
-        it('uses the default options', () => {
-            expect(withPropProxy('foo', {}).computed).toEqual({
-                fooProxy: commonProxy,
-            });
-        });
-    });
-
-    describe('with one prop as an array', () => {
-        it('adds a proxy', () => {
-            expect(withPropProxy(['bar']).computed).toEqual({
-                barProxy: commonProxy,
-            });
-        });
-    });
-
-    describe('with two props as an array', () => {
-        it('adds a proxy', () => {
-            expect(withPropProxy(['foo', 'bar']).computed).toEqual({
-                fooProxy: commonProxy,
-                barProxy: commonProxy,
-            });
-        });
-    });
-
-    describe('when suffix changed', () => {
-        it('adds a proxy with a different suffix', () => {
-            expect(withPropProxy('foo', { suffix: 'Model' }).computed).toEqual({
-                fooModel: commonProxy,
-            });
-        });
-    });
+    let retVal;
 
     describe('when suffix empty string', () => {
         it('throws an error', () => {
@@ -113,9 +42,79 @@ describe('withPropProxy', () => {
         });
     });
 
+    describe('with no props', () => {
+        beforeEach(() => {
+            retVal = withPropProxy([]);
+        });
+
+        it('adds no proxies', () => {
+            expect(retVal.mixins).toEqual([]);
+        });
+    });
+
+    describe('with one prop as string', () => {
+        beforeEach(() => {
+            retVal = withPropProxy('foo');
+        });
+
+        it('adds a proxy', () => {
+            expect(retVal.mixins[0].computed).toEqual({
+                fooProxy: commonProxy,
+            });
+        });
+
+        it('adds no watchers', () => {
+            expect(retVal.mixins[0].watch).toEqual({});
+        });
+    });
+
+    describe('with empty options supplied', () => {
+        it('uses the default options', () => {
+            expect(withPropProxy('foo', {}).mixins[0].computed).toEqual({
+                fooProxy: commonProxy,
+            });
+        });
+    });
+
+    describe('with one prop as an array', () => {
+        it('adds a proxy', () => {
+            expect(withPropProxy(['bar']).mixins[0].computed).toEqual({
+                barProxy: commonProxy,
+            });
+        });
+    });
+
+    describe('with two props as an array', () => {
+        beforeEach(() => {
+            retVal = withPropProxy(['foo', 'bar']);
+        });
+
+        it('adds 2 mixins', () => {
+            expect(retVal.mixins.length).toBe(2);
+        });
+
+        it('adds a proxy to both mixins', () => {
+            expect(retVal.mixins[0].computed).toEqual({
+                fooProxy: commonProxy,
+            });
+
+            expect(retVal.mixins[1].computed).toEqual({
+                barProxy: commonProxy,
+            });
+        });
+    });
+
+    describe('when suffix changed', () => {
+        it('adds a proxy with a different suffix', () => {
+            expect(withPropProxy('foo', { suffix: 'Model' }).mixins[0].computed).toEqual({
+                fooModel: commonProxy,
+            });
+        });
+    });
+
     describe('when object passed', () => {
         it('uses object options instead of suffix', () => {
-            expect(withPropProxy({ prop: 'foo', via: 'fooModel' }).computed)
+            expect(withPropProxy({ prop: 'foo', via: 'fooModel' }).mixins[0].computed)
                 .toEqual({
                     fooModel: commonProxy,
                 });
@@ -195,14 +194,14 @@ describe('with wrapped component', () => {
         });
 
         it('does not add optional data for non optional props', () => {
-            expect(wrapper.vm[getPropOptionalName('value')]).toBeFalsy();
-            expect(wrapper.vm[getPropOptionalName('item')]).toBeFalsy();
-            expect(wrapper.vm[getPropOptionalName('unsettable')]).toBeFalsy();
+            expect(wrapper.vm[helpers.getPropOptionalName('value')]).toBeFalsy();
+            expect(wrapper.vm[helpers.getPropOptionalName('item')]).toBeFalsy();
+            expect(wrapper.vm[helpers.getPropOptionalName('unsettable')]).toBeFalsy();
         });
 
         it('adds optional data for optional props', () => {
-            expect(wrapper.vm[getPropOptionalName('optOne')]).toBeTruthy();
-            expect(wrapper.vm[getPropOptionalName('optTwo')]).toBe(0);
+            expect(wrapper.vm[helpers.getPropOptionalName('optOne')]).toBeTruthy();
+            expect(wrapper.vm[helpers.getPropOptionalName('optTwo')]).toBe(0);
         });
 
         describe('when setting model', () => {
@@ -215,7 +214,7 @@ describe('with wrapped component', () => {
             });
 
             it('does not set the optional value', () => {
-                const prop = getPropOptionalName('value');
+                const prop = helpers.getPropOptionalName('value');
 
                 expect(wrapper.vm[prop]).toBeFalsy();
             });
