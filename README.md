@@ -8,6 +8,8 @@
 A mixin to make it easy to bind prop values to models or synced props on child
 components
 
+Created and maintained by the [Netsells team](https://netsells.co.uk/)
+
 ## Usage
 
 You can pass a string, an object, or an array of either to configure your
